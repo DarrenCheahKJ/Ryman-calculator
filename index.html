@@ -359,10 +359,16 @@
                         <input type="number" id="highPremium" class="input-field" value="75">
                     </div>
                     <div class="input-group">
-                        <label class="input-label">Discount Amount ($/day)</label>
-                        <input type="number" id="discountAmount" class="input-field derived-field" disabled>
-                        <div class="helper-text">Calculated from equity × discount rate ÷ 365 (rounded to nearest $5)</div>
+                        <label class="input-label">Care Room Premium excl. GST ($/day)</label>
+                        <input type="number" id="highPremiumExclGST" class="input-field derived-field" disabled>
+                        <div class="helper-text">Calculated as: Care Room Premium ÷ 1.15 (excluding 15% GST)</div>
                     </div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label">Discount Amount ($/day)</label>
+                    <input type="number" id="discountAmount" class="input-field derived-field" disabled>
+                    <div class="helper-text">Calculated from equity × discount rate ÷ 365 (rounded to nearest $5)</div>
                 </div>
 
                 <div class="helper-text" style="margin-bottom: 20px;">
@@ -492,6 +498,7 @@
             marginRate: document.getElementById('marginRate'),
             combinedDiscountRate: document.getElementById('combinedDiscountRate'),
             highPremium: document.getElementById('highPremium'),
+            highPremiumExclGST: document.getElementById('highPremiumExclGST'),
             discountAmount: document.getElementById('discountAmount'),
             highPremiumMonths: document.getElementById('highPremiumMonths'),
             totalTenure: document.getElementById('totalTenure'),
@@ -535,10 +542,15 @@
             const initialEquity = parseFloat(inputs.initialEquity.value) || 0;
             const interestRate = parseFloat(inputs.interestRate.value) || 0;
             const marginRate = parseFloat(inputs.marginRate.value) || 0;
+            const highPremium = parseFloat(inputs.highPremium.value) || 0;
             
             // Calculate combined discount rate
             const combinedRate = interestRate + marginRate;
             inputs.combinedDiscountRate.value = combinedRate.toFixed(2);
+            
+            // Calculate high premium excluding GST
+            const highPremiumExclGST = highPremium / 1.15;
+            inputs.highPremiumExclGST.value = highPremiumExclGST.toFixed(2);
             
             // Calculate discount amount (daily) and round to nearest $5
             const discountAmountRaw = (initialEquity * interestRate / 100) / 365;
@@ -604,7 +616,7 @@
             // Get input values
             const params = {
                 initialEquity: parseFloat(inputs.initialEquity.value) || 0,
-                highPremium: parseFloat(inputs.highPremium.value) || 0,
+                highPremiumExclGST: parseFloat(inputs.highPremiumExclGST.value) || 0,
                 discountAmount: parseFloat(inputs.discountAmount.value) || 0,
                 highPremiumMonths: parseFloat(inputs.highPremiumMonths.value) || 0,
                 totalTenure: parseFloat(inputs.totalTenure.value) || 0,
@@ -612,13 +624,13 @@
                 settlementPeriod: parseFloat(inputs.settlementPeriod.value) || 0
             };
 
-            // Calculate discounted rate
-            const discountedDaily = Math.max(0, params.highPremium - params.discountAmount);
+            // Calculate discounted rate (using GST-exclusive premium)
+            const discountedDaily = Math.max(0, params.highPremiumExclGST - params.discountAmount);
             results.discountedRate.textContent = discountedDaily.toFixed(2);
 
-            // Calculate original pricing
+            // Calculate original pricing (using GST-exclusive premium)
             const daysPerMonth = 30.44;
-            const highPremiumTotal = params.highPremiumMonths * params.highPremium * daysPerMonth;
+            const highPremiumTotal = params.highPremiumMonths * params.highPremiumExclGST * daysPerMonth;
             const discountedPremiumTotal = (params.totalTenure - params.highPremiumMonths) * discountedDaily * daysPerMonth;
             const originalTotalPremiums = highPremiumTotal + discountedPremiumTotal;
             const originalResidualEquity = params.initialEquity - originalTotalPremiums;
@@ -645,8 +657,8 @@
             
             results.npvDifference.textContent = Math.abs(originalNPV - smoothedNPV).toFixed(0);
 
-            // Update comparison table
-            comparison.comp1.textContent = '$' + params.highPremium.toFixed(2);
+            // Update comparison table (showing GST-exclusive values)
+            comparison.comp1.textContent = '$' + params.highPremiumExclGST.toFixed(2);
             comparison.comp2.textContent = '$' + discountedDaily.toFixed(2);
             comparison.comp3.textContent = formatCurrency(originalTotalPremiums);
             comparison.comp4.textContent = '$' + smoothedDaily.toFixed(2);
