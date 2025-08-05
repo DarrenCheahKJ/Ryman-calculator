@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ryman Healthcare</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 300;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .input-section {
+            background: #f8f9ff;
+            padding: 40px;
+            border-right: 1px solid #e0e0e0;
+        }
+
+        .results-section {
+            background: white;
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-field:disabled {
+            background: #f5f5f5;
+            color: #666;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .helper-text {
+            font-size: 0.8rem;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .rate-module {
+            background: #e8f5e8;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 2px solid #28a745;
+        }
+
+        .rate-module-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #155724;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .derived-field {
+            background: #e8f5e8 !important;
+            border-color: #28a745 !important;
+            font-weight: 600;
+        }
+
+        .result-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #28a745;
+        }
+
+        .result-card.original {
+            border-left-color: #007bff;
+        }
+
+        .result-card.smoothed {
+            border-left-color: #28a745;
+            background: #f0fff4;
+        }
+
+        .result-title {
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            padding: 4px 0;
+        }
+
+        .result-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .result-value.highlight {
+            color: #28a745;
+            font-size: 1.1rem;
+        }
+
+        .npv-match {
+            background: #d4edda;
+            border: 2px solid #28a745;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .npv-match .match-text {
+            color: #155724;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .instructions {
+            background: #e3f2fd;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 30px;
+            border-left: 4px solid #2196f3;
+        }
+
+        .instructions h3 {
+            color: #1976d2;
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .instructions ol {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            color: #555;
+            line-height: 1.5;
+        }
+
+        .export-section {
+            background: #fff3e0;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            border-left: 4px solid #ff9800;
+        }
+
+        .export-section h3 {
+            color: #f57c00;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn.secondary {
+            background: #28a745;
+        }
+
+        .btn.secondary:hover {
+            background: #218838;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .input-section {
+                border-right: none;
+                border-bottom: 1px solid #e0e0e0;
+            }
+            
+            .input-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+            fill: currentColor;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Ryman Healthcare</h1>
+            <p>Equity drawdown premium pricing calculator</p>
+        </div>
+
+        <div class="main-content">
+            <div class="input-section">
+                <h2 class="section-title">
+                    💰 Input Parameters
+                </h2>
+
+                <div class="input-group">
+                    <label class="input-label">Initial Equity ($)</label>
+                    <input type="number" id="initialEquity" class="input-field" value="593000">
+                </div>
+
+                <div class="rate-module">
+                    <div class="rate-module-title">
+                        📊 Discount Rate Module
+                    </div>
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label class="input-label">Discount Rate (%)</label>
+                            <input type="number" id="interestRate" class="input-field" value="3.2" step="0.1">
+                        </div>
+                        <div class="input-group">
+                            <label class="input-label">Margin Rate (%)</label>
+                            <input type="number" id="marginRate" class="input-field" value="2.0" step="0.1">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Interest Rate (% p.a.)</label>
+                        <input type="number" id="combinedDiscountRate" class="input-field derived-field" disabled>
+                        <div class="helper-text">Calculated as: Discount Rate + Margin Rate</div>
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label class="input-label">Care Room Premium ($/day)</label>
+                        <input type="number" id="highPremium" class="input-field" value="75">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Discount Amount ($/day)</label>
+                        <input type="number" id="discountAmount" class="input-field derived-field" disabled>
+                        <div class="helper-text">Calculated from equity × discount rate ÷ 365 (rounded to nearest $5)</div>
+                    </div>
+                </div>
+
+                <div class="helper-text" style="margin-bottom: 20px;">
+                    Discounted rate: $<span id="discountedRate">20.00</span>/day
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label class="input-label">High Premium Period (months)</label>
+                        <input type="number" id="highPremiumMonths" class="input-field" value="4">
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Total Tenure (months)</label>
+                        <input type="number" id="totalTenure" class="input-field" value="21">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label class="input-label">NPV Discount Rate (annual %)</label>
+                        <input type="number" id="npvDiscountRate" class="input-field" value="8.5" step="0.1">
+                        <div class="helper-text">Rate used for NPV calculations</div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label">Settlement Period (months)</label>
+                        <input type="number" id="settlementPeriod" class="input-field" value="5" step="0.1">
+                    </div>
+                </div>
+            </div>
+
+            <div class="results-section">
+                <h2 class="section-title">
+                    📊 Results
+                </h2>
+
+                <div class="result-card original">
+                    <div class="result-title">Original Tiered Pricing</div>
+                    
+                    <div class="result-item">
+                        <span>Total Premiums:</span>
+                        <span class="result-value" id="originalTotalPremiums">$19,484</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Residual Equity:</span>
+                        <span class="result-value" id="originalResidual">$573,516</span>
+					 </div>
+					<div class="result-item">
+                        <span>NPV:</span>
+                        <span class="result-value" id="originalNPV">$76,274</span>
+                    </div>
+                </div>
+
+                <div class="result-card smoothed">
+                    <div class="result-title">Smoothed Pricing (Equivalent NPV)</div>
+                    <div class="result-item">
+                        <span>Daily Premium:</span>
+                        <span class="result-value highlight" id="smoothedDaily">$30.68</span>
+                    </div>
+                    <div class="result-item">
+                        <span>Monthly Premium:</span>
+                        <span class="result-value highlight" id="smoothedMonthly">$933</span>
+                    </div>
+                    <div class="result-item">
+                        <span>NPV:</span>
+                        <span class="result-value" id="smoothedNPV">$76,274</span>
+                    </div>
+                </div>
+
+                <div class="npv-match">
+                    <div class="match-text">✅ NPV Difference: $<span id="npvDifference">0</span></div>
+                </div>
+
+                <table class="comparison-table">
+                    <thead>
+                        <tr>
+                            <th>Metric</th>
+                            <th>Original</th>
+                            <th>Smoothed</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Daily Rate (First 4 months)</td>
+                            <td id="comp1">$75.00</td>
+                            <td id="comp4">$30.68</td>
+                        </tr>
+                        <tr>
+                            <td>Daily Rate (Remaining months)</td>
+                            <td id="comp2">$20.00</td>
+                            <td id="comp5">$30.68</td>
+                        </tr>
+                        <tr>
+                            <td>Total Premiums</td>
+                            <td id="comp3">$19,484</td>
+                            <td id="comp6">$19,484</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 How to Use This Calculator</h3>
+            <ol>
+                <li><strong>Enter initial equity</strong> and adjust the discount and margin rates in the discount rate module [only if assumptions have changed]</li>
+                <li><strong>Set the care room premium rate</strong> - the discount amount will be automatically calculated</li>
+                <li><strong>Configure timing parameters</strong> - premium periods, tenure, and settlement timing [only if assumptions have changed]</li>
+                <li><strong>Review both pricing models</strong> - original tiered vs. equivalent smoothed pricing</li>
+                <li><strong>Save or share this page</strong> using the export options below</li>
+            </ol>
+        </div>
+
+        <div class="export-section">
+            <h3>💾 Save & Share</h3>
+            <p>Use these options to save and share your calculations:</p>
+            <button class="btn" onclick="printPage()">🖨️ Print/Save as PDF</button>
+            <button class="btn secondary" onclick="shareUrl()">🔗 Copy Shareable Link</button>
+            <button class="btn" onclick="saveHtml()">💾 Save HTML File</button>
+        </div>
+    </div>
+
+    <script>
+        // Input elements
+        const inputs = {
+            initialEquity: document.getElementById('initialEquity'),
+            interestRate: document.getElementById('interestRate'),
+            marginRate: document.getElementById('marginRate'),
+            combinedDiscountRate: document.getElementById('combinedDiscountRate'),
+            highPremium: document.getElementById('highPremium'),
+            discountAmount: document.getElementById('discountAmount'),
+            highPremiumMonths: document.getElementById('highPremiumMonths'),
+            totalTenure: document.getElementById('totalTenure'),
+            npvDiscountRate: document.getElementById('npvDiscountRate'),
+            settlementPeriod: document.getElementById('settlementPeriod')
+        };
+
+        // Result elements
+        const results = {
+            discountedRate: document.getElementById('discountedRate'),
+            originalNPV: document.getElementById('originalNPV'),
+            originalTotalPremiums: document.getElementById('originalTotalPremiums'),
+            originalResidual: document.getElementById('originalResidual'),
+            smoothedDaily: document.getElementById('smoothedDaily'),
+            smoothedMonthly: document.getElementById('smoothedMonthly'),
+            smoothedNPV: document.getElementById('smoothedNPV'),
+            npvDifference: document.getElementById('npvDifference')
+        };
+
+        // Comparison table elements
+        const comparison = {
+            comp1: document.getElementById('comp1'),
+            comp2: document.getElementById('comp2'),
+            comp3: document.getElementById('comp3'),
+            comp4: document.getElementById('comp4'),
+            comp5: document.getElementById('comp5'),
+            comp6: document.getElementById('comp6')
+        };
+
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('en-AU', {
+                style: 'currency',
+                currency: 'AUD',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(amount);
+        }
+
+        // Calculate derived values
+        function updateDerivedValues() {
+            const initialEquity = parseFloat(inputs.initialEquity.value) || 0;
+            const interestRate = parseFloat(inputs.interestRate.value) || 0;
+            const marginRate = parseFloat(inputs.marginRate.value) || 0;
+            
+            // Calculate combined discount rate
+            const combinedRate = interestRate + marginRate;
+            inputs.combinedDiscountRate.value = combinedRate.toFixed(2);
+            
+            // Calculate discount amount (daily) and round to nearest $5
+            const discountAmountRaw = (initialEquity * interestRate / 100) / 365;
+            const discountAmount = Math.round(discountAmountRaw / 5) * 5;
+            inputs.discountAmount.value = discountAmount.toFixed(2);
+        }
+
+        // Calculate XNPV equivalent
+        function calculateXNPV(cashFlows, rate, months) {
+            let npv = 0;
+            const monthlyRate = rate / 12;
+            
+            for (let i = 0; i < cashFlows.length; i++) {
+                if (cashFlows[i] !== 0) {
+                    const discountFactor = Math.pow(1 + monthlyRate, months[i]);
+                    npv += cashFlows[i] / discountFactor;
+                }
+            }
+            return npv;
+        }
+
+        // Binary search for smoothed premium
+        function solveForSmoothedPremium(targetNPV, params) {
+            let low = 0;
+            let high = 200;
+            const tolerance = 0.1;
+            const maxIterations = 1000;
+            let iterations = 0;
+
+            while (iterations < maxIterations && (high - low) > 0.001) {
+                const mid = (low + high) / 2;
+                const testNPV = calculateSmoothedNPV(mid, params);
+                
+                if (Math.abs(testNPV - targetNPV) < tolerance) {
+                    return mid;
+                }
+                
+                if (testNPV < targetNPV) {
+                    low = mid;
+                } else {
+                    high = mid;
+                }
+                iterations++;
+            }
+            
+            return (low + high) / 2;
+        }
+
+        function calculateSmoothedNPV(dailyPremium, params) {
+            const totalPremiums = params.totalTenure * dailyPremium * 30.44;
+            const residualEquity = params.initialEquity - totalPremiums;
+            
+            const cashFlows = [params.initialEquity, -residualEquity];
+            const months = [params.settlementPeriod, params.totalTenure];
+            
+            return calculateXNPV(cashFlows, params.npvDiscountRate / 100, months);
+        }
+
+        function calculate() {
+            // Update derived values first
+            updateDerivedValues();
+
+            // Get input values
+            const params = {
+                initialEquity: parseFloat(inputs.initialEquity.value) || 0,
+                highPremium: parseFloat(inputs.highPremium.value) || 0,
+                discountAmount: parseFloat(inputs.discountAmount.value) || 0,
+                highPremiumMonths: parseFloat(inputs.highPremiumMonths.value) || 0,
+                totalTenure: parseFloat(inputs.totalTenure.value) || 0,
+                npvDiscountRate: parseFloat(inputs.npvDiscountRate.value) || 0,
+                settlementPeriod: parseFloat(inputs.settlementPeriod.value) || 0
+            };
+
+            // Calculate discounted rate
+            const discountedDaily = Math.max(0, params.highPremium - params.discountAmount);
+            results.discountedRate.textContent = discountedDaily.toFixed(2);
+
+            // Calculate original pricing
+            const daysPerMonth = 30.44;
+            const highPremiumTotal = params.highPremiumMonths * params.highPremium * daysPerMonth;
+            const discountedPremiumTotal = (params.totalTenure - params.highPremiumMonths) * discountedDaily * daysPerMonth;
+            const originalTotalPremiums = highPremiumTotal + discountedPremiumTotal;
+            const originalResidualEquity = params.initialEquity - originalTotalPremiums;
+
+            // Calculate original NPV using XNPV equivalent
+            const originalCashFlows = [params.initialEquity, -originalResidualEquity];
+            const originalMonths = [params.settlementPeriod, params.totalTenure];
+            const originalNPV = calculateXNPV(originalCashFlows, params.npvDiscountRate / 100, originalMonths);
+
+            // Solve for smoothed premium
+            const smoothedDaily = solveForSmoothedPremium(originalNPV, params);
+            const smoothedTotalPremiums = params.totalTenure * smoothedDaily * daysPerMonth;
+            const smoothedResidualEquity = params.initialEquity - smoothedTotalPremiums;
+            const smoothedNPV = calculateSmoothedNPV(smoothedDaily, params);
+
+            // Update results
+            results.originalNPV.textContent = formatCurrency(originalNPV);
+            results.originalTotalPremiums.textContent = formatCurrency(originalTotalPremiums);
+            results.originalResidual.textContent = formatCurrency(originalResidualEquity);
+            
+            results.smoothedDaily.textContent = '$' + smoothedDaily.toFixed(2);
+            results.smoothedMonthly.textContent = formatCurrency(smoothedDaily * daysPerMonth);
+            results.smoothedNPV.textContent = formatCurrency(smoothedNPV);
+            
+            results.npvDifference.textContent = Math.abs(originalNPV - smoothedNPV).toFixed(0);
+
+            // Update comparison table
+            comparison.comp1.textContent = '$' + params.highPremium.toFixed(2);
+            comparison.comp2.textContent = '$' + discountedDaily.toFixed(2);
+            comparison.comp3.textContent = formatCurrency(originalTotalPremiums);
+            comparison.comp4.textContent = '$' + smoothedDaily.toFixed(2);
+            comparison.comp5.textContent = '$' + smoothedDaily.toFixed(2);
+            comparison.comp6.textContent = formatCurrency(smoothedTotalPremiums);
+        }
+
+        // Export functions
+        function printPage() {
+            window.print();
+        }
+
+        function shareUrl() {
+            const params = new URLSearchParams();
+            // Only include the input parameters that users can modify
+            params.set('initialEquity', inputs.initialEquity.value);
+            params.set('interestRate', inputs.interestRate.value);
+            params.set('marginRate', inputs.marginRate.value);
+            params.set('highPremium', inputs.highPremium.value);
+            params.set('highPremiumMonths', inputs.highPremiumMonths.value);
+            params.set('totalTenure', inputs.totalTenure.value);
+            params.set('npvDiscountRate', inputs.npvDiscountRate.value);
+            params.set('settlementPeriod', inputs.settlementPeriod.value);
+            
+            const url = window.location.origin + window.location.pathname + '?' + params.toString();
+            
+            navigator.clipboard.writeText(url).then(() => {
+                alert('Shareable link copied to clipboard!');
+            }).catch(() => {
+                prompt('Copy this link:', url);
+            });
+        }
+
+        function saveHtml() {
+            const html = document.documentElement.outerHTML;
+            const blob = new Blob([html], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'equity_drawdown_calculator.html';
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Load parameters from URL if present
+        function loadFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const urlInputs = ['initialEquity', 'interestRate', 'marginRate', 'highPremium', 'highPremiumMonths', 'totalTenure', 'npvDiscountRate', 'settlementPeriod'];
+            
+            urlInputs.forEach(key => {
+                if (params.has(key) && inputs[key]) {
+                    inputs[key].value = params.get(key);
+                }
+            });
+        }
+
+        // Add event listeners only to user-editable inputs
+        const editableInputs = [
+            inputs.initialEquity,
+            inputs.interestRate,
+            inputs.marginRate,
+            inputs.highPremium,
+            inputs.highPremiumMonths,
+            inputs.totalTenure,
+            inputs.npvDiscountRate,
+            inputs.settlementPeriod
+        ];
+
+        editableInputs.forEach(input => {
+            input.addEventListener('input', calculate);
+        });
+
+        // Initialize
+        loadFromUrl();
+        calculate();
+    </script>
+</body>
+</html>
